@@ -33,7 +33,6 @@ class MealItem extends StatelessWidget {
               builder: (context) => MealDetailScreen(meal: meal),
             ),
           );
-          MealDetailScreen(meal: meal);
         },
         child: Stack(
           children: [
