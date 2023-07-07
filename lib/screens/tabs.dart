@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:meals/data/dummy_meals.dart';
 import 'package:meals/models/meal_model.dart';
 import 'package:meals/screens/categories_screen.dart';
 import 'package:meals/screens/filters_screen.dart';
 import 'package:meals/screens/meals_screen.dart';
 import 'package:meals/widgets/drawer.dart';
+
+const kinitialfilters = {
+  Filter.glutenfree: false,
+  Filter.lactosefree: false,
+  Filter.vegetarian: false,
+  Filter.vegan: false,
+};
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -13,6 +21,8 @@ class TabsScreen extends StatefulWidget {
 }
 
 class _TabsScreenState extends State<TabsScreen> {
+  Map<Filter, bool> _selectedfilters = kinitialfilters;
+
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context)
@@ -45,20 +55,43 @@ class _TabsScreenState extends State<TabsScreen> {
       final result = await Navigator.of(context).push<Map<Filter, bool>>(
         MaterialPageRoute(
           builder: (ctx) {
-            return const FiltersScreen();
+            return FiltersScreen(
+              currentfilters: _selectedfilters,
+            );
           },
         ),
       );
-      print(result);
+      setState(() {
+        _selectedfilters = result ?? kinitialfilters;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final availablemeals = dummyMeals.where((meal) {
+      if (_selectedfilters[Filter.glutenfree]! && !meal.isGlutenFree) {
+        return false;
+      }
+      if (_selectedfilters[Filter.lactosefree]! && !meal.isLactoseFree) {
+        return false;
+      }
+      if (_selectedfilters[Filter.vegetarian]! && !meal.isVegetarian) {
+        return false;
+      }
+      if (_selectedfilters[Filter.vegan]! && !meal.isVegan) {
+        return false;
+      }
+      return true;
+    }).toList();
+
     Widget activeScreen = CategoriesScreen(
       OnToggleFavorite: CheckFavoriteMeals,
+      availablemeals: availablemeals,
     );
+
     var activeScreenTitle = 'Categories';
+
     if (_selectedPageIndex == 1) {
       activeScreen = MealsScreen(
         meals: favoriteMeals,
