@@ -4,6 +4,7 @@ class MealItemRow extends StatelessWidget {
   const MealItemRow({super.key, required this.icon, required this.label});
   final String label;
   final IconData icon;
+
   @override
   Widget build(BuildContext context) {
     return Row(

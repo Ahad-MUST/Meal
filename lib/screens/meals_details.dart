@@ -18,24 +18,36 @@ class MealDetailScreen extends ConsumerWidget {
         title: Text(meal.title),
         actions: [
           IconButton(
-              onPressed: () {
-                final wasadded = ref
-                    .read(favoriteprovider.notifier)
-                    .togglefavoritestatus(meal);
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Center(
-                      child: Text(
-                        wasadded
-                            ? 'Meal added as a Favorite'
-                            : 'Meal removed from Favporites',
-                      ),
+            onPressed: () {
+              final wasadded = ref
+                  .read(favoriteprovider.notifier)
+                  .togglefavoritestatus(meal);
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Center(
+                    child: Text(
+                      wasadded
+                          ? 'Meal added as a Favorite'
+                          : 'Meal removed from Favporites',
                     ),
                   ),
-                );
-              },
-              icon: Icon(isfavorite ? Icons.star : Icons.star_border)),
+                ),
+              );
+            },
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+                    parent: animation, curve: Curves.bounceInOut)),
+                child: child,
+              ),
+              child: Icon(
+                isfavorite ? Icons.star : Icons.star_border,
+                key: ValueKey(isfavorite),
+              ),
+            ),
+          ),
         ],
       ),
       body: Padding(
@@ -43,11 +55,14 @@ class MealDetailScreen extends ConsumerWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Image.network(
-                meal.imageUrl,
-                height: 275,
-                fit: BoxFit.cover,
-                width: double.infinity,
+              Hero(
+                tag: meal.id,
+                child: Image.network(
+                  meal.imageUrl,
+                  height: 275,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
               const SizedBox(
                 height: 10,
